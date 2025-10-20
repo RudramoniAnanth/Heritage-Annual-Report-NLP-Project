@@ -3,10 +3,17 @@ import json
 import numpy as np
 import requests
 import streamlit as st
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.preprocessing import normalize
-from sklearn.metrics.pairwise import cosine_similarity
+
+# Import sklearn with error handling
+try:
+    from sklearn.feature_extraction.text import CountVectorizer
+    from sklearn.feature_extraction.text import TfidfTransformer
+    from sklearn.preprocessing import normalize
+    from sklearn.metrics.pairwise import cosine_similarity
+except ImportError as e:
+    st.error(f"Missing required package: {e}")
+    st.error("Please ensure scikit-learn is installed. Check your requirements.txt file.")
+    st.stop()
 
 # --- Configuration ---
 OPENROUTER_API_KEY = "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"  # hardcoded per user request
