@@ -12,8 +12,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 OPENROUTER_API_KEY = "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"  # hardcoded per user request
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL_NAME = "openai/gpt-3.5-turbo"
-DATA_PATH = r"C:\Users\rudra\Desktop\nlpp\proj\chatbot_data.json"
-FAQ_PDF_PATH = r"C:\Users\rudra\Desktop\nlpp\proj\Heritage_Foods_2024_25_FAQ.pdf"
+# Use relative paths for deployment compatibility
+DATA_PATH = "chatbot_data.json"
+FAQ_PDF_PATH = "Heritage_Foods_2024_25_FAQ.pdf"
 MAX_SNIPPETS = 5
 MAX_SNIPPET_CHARS = 1000
 
@@ -28,12 +29,20 @@ def get_api_key() -> str:
 
 @st.cache_resource
 def load_artifacts(path: str = DATA_PATH):
-	with open(path, 'r', encoding='utf-8') as f:
-		data = json.load(f)
-	pages = data['pages']
-	vocab = data['vocabulary']
-	matrix = np.array(data['tfidf_matrix'], dtype=float)
-	return pages, vocab, matrix
+	try:
+		with open(path, 'r', encoding='utf-8') as f:
+			data = json.load(f)
+		pages = data['pages']
+		vocab = data['vocabulary']
+		matrix = np.array(data['tfidf_matrix'], dtype=float)
+		return pages, vocab, matrix
+	except FileNotFoundError:
+		st.error(f"Required file not found: {path}")
+		st.error("Please ensure chatbot_data.json is uploaded to your Streamlit app.")
+		st.stop()
+	except Exception as e:
+		st.error(f"Error loading data: {e}")
+		st.stop()
 
 @st.cache_resource
 def build_vectorizer(vocabulary: dict):
